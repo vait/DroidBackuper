@@ -31,5 +31,7 @@ Start application
 Find in tray icon with clock
 Open settings
 Enjoy
+## License
+I don't understand anything in licenses. I'll be very happy if my code can help for you.
 ## PS
 Sory for my English ;)
