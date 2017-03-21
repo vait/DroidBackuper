@@ -1,0 +1,127 @@
+﻿<Window x:Class="DroidBackuper.NET.MainWindow"
+        x:Name="configurationWnd" 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DroidBackuper.NET"
+        xmlns:classHelpers="clr-namespace:DroidBackuper.NET.Classes.Helpers"
+        xmlns:commands="clr-namespace:DroidBackuper.NET.ViewModels.Commands"
+        mc:Ignorable="d"
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+        Title="DroidBackuper .NET Configuration" Height="370" Width="525" ResizeMode="NoResize" ScrollViewer.VerticalScrollBarVisibility="Disabled" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" Icon="Images/Alarm.ico" >
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Device manufacturer" />
+        <TextBox Grid.Row="1" Text="{Binding DeviceManufacturer}">
+            <TextBox.Resources>
+                <Style TargetType="TextBox">
+                    <Setter Property="Background" Value="White" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DeviceManufacturer}" Value="">
+                            <Setter Property="Background" Value="PaleGoldenrod" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding DeviceManufacturer}" Value="{x:Null}">
+                            <Setter Property="Background" Value="PaleGoldenrod" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+
+        <TextBlock Grid.Row="3" Text="Device name" />
+        <TextBox Grid.Row="4" Text="{Binding DeviceName}">
+            <TextBox.Resources>
+                <Style TargetType="TextBox">
+                    <Setter Property="Background" Value="White" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DeviceManufacturer}" Value="">
+                            <Setter Property="Background" Value="PaleGoldenrod" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding DeviceManufacturer}" Value="{x:Null}">
+                            <Setter Property="Background" Value="PaleGoldenrod" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Left">
+            <TextBlock Text="Start interval (in minutes): " />
+            <TextBox Text="{Binding StartInterval}" MinWidth="30" TextAlignment="Right" />
+            <TextBlock Text=" [min 1; max 500]" />
+        </StackPanel>
+        <Slider Grid.Row="7" Minimum="1" Maximum="500" Value="{Binding StartInterval}" />
+
+        <CheckBox Grid.Row="9" IsChecked="{Binding IsStartup}">
+            Start DroidBackuper with system
+        </CheckBox>
+
+        <CheckBox Grid.Row="12" IsChecked="{Binding DeviceLog}">
+             Write full device information to log
+        </CheckBox>
+
+        <TextBlock Grid.Row="15" Text="Commands (write commands separated by &quot;;&quot;, which you can execute in Run window)" />
+        <TextBox Grid.Row="16" Text="{Binding Commands}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MinLines="3">
+            <TextBox.Resources>
+                <Style TargetType="TextBox">
+                    <Setter Property="Background" Value="White" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DeviceManufacturer}" Value="">
+                            <Setter Property="Background" Value="PaleGoldenrod" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding DeviceManufacturer}" Value="{x:Null}">
+                            <Setter Property="Background" Value="PaleGoldenrod" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+
+        <StackPanel Grid.Row="9999" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="10" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Apply" Padding="10"
+                        Command="{Binding ApplyBtnClick, Mode=OneWay}" 
+                        CommandParameter="{Binding ElementName=configurationWnd}"/>
+                <Button Grid.Column="2" Content="Cancel" Padding="10" 
+                        Command="{Binding CancelCommandBtn, Mode=OneWay}" 
+                        CommandParameter="{Binding ElementName=configurationWnd}"/>
+            </Grid>
+            
+        </StackPanel>
+    </Grid>
+</Window>

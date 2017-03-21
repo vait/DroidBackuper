@@ -1,0 +1,38 @@
+﻿<Application x:Name="droidBackuperApp" x:Class="DroidBackuper.NET.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:commands="clr-namespace:DroidBackuper.NET.ViewModels.Commands"
+             xmlns:classHelpers="clr-namespace:DroidBackuper.NET.Classes.Helpers"
+             xmlns:local="clr-namespace:DroidBackuper.NET"
+             ShutdownMode="OnExplicitShutdown">
+    <Application.Resources>
+        <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:tb="http://www.hardcodet.net/taskbar">
+
+            <!-- Globally declared notify icon -->
+            <tb:TaskbarIcon x:Key="BackuperTrayIcon"
+                      IconSource="pack://application:,,,/Images/Alarm.ico"
+                      ToolTipText="Droid Backuper"
+                      DoubleClickCommand="{commands:OpenSettingsCommand}"
+                      DoubleClickCommandParameter="{Binding}">
+                <!-- Set a simple context menu  -->
+                <tb:TaskbarIcon.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Open settings" FontWeight="Bold" Command="{commands:OpenSettingsCommand}" CommandParameter="{Binding}" />
+                        <Separator />
+                        <MenuItem Header="Start with system" IsCheckable="True" 
+                                  IsChecked="{Binding Path=(classHelpers:RegistryHelper.IsStartup), Mode=OneWay}"
+                                  Command="{commands:StartupCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+                        <MenuItem Header="Write full log" IsCheckable="True" 
+                                  IsChecked="{Binding Path=(classHelpers:ConfigHelper.DeviceLog), Mode=OneWay}"
+                                  Command="{commands:DeviceLogCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+                        <Separator />
+                        <MenuItem Header="Exit" Command="{commands:ExitCommand}" CommandParameter="{Binding}"/>
+                    </ContextMenu>
+                </tb:TaskbarIcon.ContextMenu>
+            </tb:TaskbarIcon>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
