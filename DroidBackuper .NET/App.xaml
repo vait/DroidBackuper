@@ -19,12 +19,12 @@
                 <!-- Set a simple context menu  -->
                 <tb:TaskbarIcon.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Open settings" FontWeight="Bold" Command="{commands:OpenSettingsCommand}" CommandParameter="{Binding}" />
+                        <MenuItem Header="Open settings" FontWeight="Bold" Command="{commands:OpenSettingsCommand}"  />
                         <Separator />
-                        <MenuItem Header="Start with system" IsCheckable="True" 
+                        <MenuItem Header="Start with system" IsCheckable="True"
                                   IsChecked="{Binding Path=(classHelpers:RegistryHelper.IsStartup), Mode=OneWay}"
                                   Command="{commands:StartupCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
-                        <MenuItem Header="Write full log" IsCheckable="True" 
+                        <MenuItem Header="Write full log" IsCheckable="True"
                                   IsChecked="{Binding Path=(classHelpers:ConfigHelper.DeviceLog), Mode=OneWay}"
                                   Command="{commands:DeviceLogCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
                         <Separator />
