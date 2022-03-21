@@ -1,74 +1,132 @@
-﻿
+﻿using DroidBackuper.NET.Classes.Model;
 using System;
 using System.Configuration;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DroidBackuper.NET.Classes.Helpers
 {
-    internal static class ConfigHelper
-    {
-        #region Bindings
-        public static event EventHandler DeviceLogChanged;
-        #endregion
+	internal static class ConfigHelper
+	{
+		private static readonly JsonSerializerOptions options = new JsonSerializerOptions
+		{
+			WriteIndented = true,
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+			PropertyNameCaseInsensitive = true,
+		};
 
-        public static bool DeviceLog
-        {
-            get
-            {
-                return Configuration != null ? Configuration.DeviceLog : false;
-            }
-            set
-            {
-                if (Configuration.DeviceLog != value)
-                {
-                    Configuration.DeviceLog = value;
-                    DeviceLogChanged?.Invoke(null, EventArgs.Empty);
-                }
-            }
-        }
+		private static readonly string _oldFilPath;
+		private static readonly string _newFilPath;
 
-        public static AppConfiguration Configuration { get; private set; }
 
-        static ConfigHelper()
-        {
-            var appSettings = ConfigurationManager.AppSettings;
-            Configuration = new AppConfiguration();
-            //Константы
-            int startInterval = 1;
-            if (int.TryParse(appSettings["StartInterval"], out startInterval)) {
-                Configuration.StartInterval = startInterval;
-            }
+		#region Bindings
+		public static event EventHandler DeviceLogChanged;
+		#endregion
 
-            bool deviceLog = false;
-            if (Boolean.TryParse(appSettings["DeviceLog"], out deviceLog)) {
-                Configuration.DeviceLog = deviceLog;
-            }
+		public static bool DeviceLog
+		{
+			get
+			{
+				return Configuration != null ? Configuration.DeviceLog : false;
+			}
+			set
+			{
+				if (Configuration.DeviceLog != value)
+				{
+					Configuration.DeviceLog = value;
+					DeviceLogChanged?.Invoke(null, EventArgs.Empty);
+				}
+			}
+		}
 
-            Configuration.DeviceManufacturer = appSettings["DeviceManufacturer"];
-            Configuration.DeviceName = appSettings["DeviceName"];
-            Configuration.Commands = appSettings["Commands"]?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
-            Configuration.Logger = new TextLogger();
-        }
+		public static AppConfiguration Configuration { get; private set; }
 
-        internal static void Save()
-        {
-            var execfg = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+		static ConfigHelper()
+		{
+			var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+			_oldFilPath = exePath + ".config";
+			_newFilPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "appsettings.json");
 
-            execfg.AppSettings.Settings.Remove("StartInterval");
-            execfg.AppSettings.Settings.Add("StartInterval", Configuration.StartInterval.ToString());
+			Configuration = Load();
+		}
 
-            execfg.AppSettings.Settings.Remove("DeviceLog");
-            execfg.AppSettings.Settings.Add("DeviceLog", Configuration.DeviceLog.ToString());
+		internal static void Save()
+		{
+			var settings = Configuration.ToAppConfiguration();
+			Save(settings);
+		}
 
-            execfg.AppSettings.Settings.Remove("DeviceManufacturer");
-            execfg.AppSettings.Settings.Add("DeviceManufacturer", Configuration.DeviceManufacturer);
+		internal static void Save(Settings settings)
+		{
+			var a = JsonSerializer.Serialize(settings, options);
+			File.WriteAllText(_newFilPath, a);
+		}
 
-            execfg.AppSettings.Settings.Remove("DeviceName");
-            execfg.AppSettings.Settings.Add("DeviceName", Configuration.DeviceName);
+		private static AppConfiguration Load()
+		{
+			CopyIfNeed();
 
-            execfg.AppSettings.Settings.Remove("Commands");
-            execfg.AppSettings.Settings.Add("Commands", String.Join(";", Configuration.Commands));
+			using var fs = new FileStream(_newFilPath, FileMode.Open, FileAccess.Read);
+			var settings = JsonSerializer.Deserialize<Settings>(fs, options);
+			var appConfig = settings.ToAppConfiguration();
+			appConfig.Logger = new TextLogger();
 
-            execfg.Save();
-        }
-    }
+			return appConfig;
+		}
+
+		private static void CopyIfNeed()
+		{
+			Settings settings;
+
+			if (File.Exists(_oldFilPath))
+			{
+				settings = new Settings();
+				var appSettings = ConfigurationManager.AppSettings;
+				//Константы
+				int startInterval = 1;
+				if (int.TryParse(appSettings["StartInterval"], out startInterval))
+				{
+					settings.StartInterval = TimeSpan.FromSeconds(startInterval);
+				}
+
+				if (Boolean.TryParse(appSettings["DeviceLog"], out var deviceLog))
+				{
+					settings.DeviceLog = deviceLog;
+				}
+
+				settings.DeviceManufacturer = appSettings["DeviceManufacturer"];
+				settings.DeviceName = appSettings["DeviceName"];
+				settings.Commands = appSettings["Commands"];
+
+				Save(settings);
+
+				File.Delete(_oldFilPath);
+			}
+		}
+
+		private static AppConfiguration ToAppConfiguration(this Settings settings)
+		{
+			var appConfig = new AppConfiguration();
+			appConfig.StartInterval = settings.StartInterval;
+			appConfig.DeviceLog = settings.DeviceLog;
+			appConfig.DeviceManufacturer = settings.DeviceManufacturer;
+			appConfig.DeviceName = settings.DeviceName;
+			appConfig.Commands = settings.Commands?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
+
+			return appConfig;
+		}
+
+		private static Settings ToAppConfiguration(this AppConfiguration appConfig)
+		{
+			var settings = new Settings();
+			settings.StartInterval = appConfig.StartInterval;
+			settings.DeviceLog = appConfig.DeviceLog;
+			settings.DeviceManufacturer = appConfig.DeviceManufacturer;
+			settings.DeviceName = appConfig.DeviceName;
+			settings.Commands = (appConfig.Commands != null && appConfig.Commands.Length > 0) ? string.Join(';', appConfig.Commands) : null;
+
+			return settings;
+		}
+	}
 }

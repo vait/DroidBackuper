@@ -1,12 +1,14 @@
 ﻿using DroidBackuper.NET.Classes.Helpers;
 using System;
 using System.Management;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DroidBackuper.NET.Classes.Model
 {
+	[SupportedOSPlatform("windows")]
 	class EventHooker : IDisposable
 	{
 		/// <summary>
@@ -92,7 +94,7 @@ namespace DroidBackuper.NET.Classes.Model
 		/// <summary>
 		/// С какой периодичностью ожидать следующего подключения в минутах
 		/// </summary>
-		private int StartInterval
+		private TimeSpan StartInterval
 		{
 			get
 			{
@@ -161,21 +163,13 @@ namespace DroidBackuper.NET.Classes.Model
 
 			logText.AppendLine("\t" + name);
 
-			//Запишем для себя информацию о подключенном устройстве. Не важно каком.
-			var deviceInstance = device.Properties["PNPDeviceID"].Value.ToString();
-			var classGuid = Guid.Parse(device.Properties["ClassGuid"].Value.ToString());
-
-			if (this.DeviceLog && device.Properties["ClassGuid"].Value != null)
+			if (DeviceLog && device.Properties["ClassGuid"].Value != null)
 			{
-				new Task(
-					async () =>
-					{
-						await Task.Delay(1);
-						var di = new SystemDeviceInfo();
-						di.PrintInfo(classGuid, deviceInstance, Logger);
-					}
-					).Start();
-				//
+				//Запишем для себя информацию о подключенном устройстве. Не важно каком.
+				var deviceInstance = device.Properties["PNPDeviceID"].Value.ToString();
+				var classGuid = Guid.Parse(device.Properties["ClassGuid"].Value.ToString());
+
+				PrindDeviseInfoWithDelay(classGuid, deviceInstance, 10, Logger).FireAndForgot(Logger);
 			}
 
 			switch (PNPClass)
@@ -210,6 +204,13 @@ namespace DroidBackuper.NET.Classes.Model
 			logText.AppendLine(String.Format("[{0}]-------------- END CheckDevice -----------", DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff")));
 
 			Logger.WriteLog(logText.ToString());
+		}
+
+		private async Task PrindDeviseInfoWithDelay(Guid classGuid, string deviceInstance, int delayTimeout, ILogger logger)
+		{
+			await Task.Delay(delayTimeout);
+			var di = new SystemDeviceInfo();
+			di.PrintInfo(classGuid, deviceInstance, logger);
 		}
 
 		/// <summary>
@@ -248,7 +249,7 @@ namespace DroidBackuper.NET.Classes.Model
 			if (this.waitingDevices.Wait(this.waitNextEventTime) &&
 				this.waitingDevices.Wait(this.waitNextEventTime))
 			{
-				if ((DateTime.Now - this.lastStart).TotalMinutes > this.StartInterval)
+				if ((DateTime.Now - this.lastStart) > this.StartInterval)
 				{
 					logText.AppendLine("\t Executer WORKING");
 					this.Action();

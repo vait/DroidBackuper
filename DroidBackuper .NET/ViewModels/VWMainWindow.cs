@@ -1,9 +1,11 @@
 ﻿using DroidBackuper.NET.Classes.Helpers;
 using DroidBackuper.NET.ViewModels.Helpers;
 using System;
+using System.Runtime.Versioning;
 
 namespace DroidBackuper.NET.ViewModels
 {
+	[SupportedOSPlatform("windows")]
 	internal class VWMainWindow : ViewModelBase
 	{
 		#region Свойства
@@ -154,7 +156,7 @@ namespace DroidBackuper.NET.ViewModels
 			var cfg = ConfigHelper.Configuration;
 			deviceManufacturer = cfg.DeviceManufacturer;
 			deviceName = cfg.DeviceName;
-			startInterval = cfg.StartInterval;
+			startInterval = (int)cfg.StartInterval.TotalMinutes;
 			deviceLog = cfg.DeviceLog;
 			isStartap = RegistryHelper.IsStartup;
 			commands = string.Join(";", cfg.Commands);
@@ -193,7 +195,7 @@ namespace DroidBackuper.NET.ViewModels
 			var cfg = ConfigHelper.Configuration;
 			cfg.DeviceManufacturer = deviceManufacturer;
 			cfg.DeviceName = deviceName;
-			cfg.StartInterval = startInterval;
+			cfg.StartInterval = TimeSpan.FromMinutes(startInterval);
 			ConfigHelper.DeviceLog = deviceLog;
 			cfg.Commands = commands.Split(new[] { ';' });
 

@@ -2,23 +2,30 @@
 
 namespace DroidBackuper.NET.Classes.Model
 {
-    struct Settings
-    {
-        private string deviceName;
+	class Settings
+	{
+		/// <summary>
+		/// Название устройства.
+		/// </summary>
+		public string DeviceName { get; set; }
 
-        public string DeviceName
-        {
-            get { return deviceName; }
-            set { deviceName = value; }
-        }
+		//Производитель.
+		public string DeviceManufacturer { get; set; }
 
-        private string deviceManufacturer;
+		/// <summary>
+		/// Запуск скрипта не реже чем один раз в
+		/// </summary>
+		public TimeSpan StartInterval { get; set; } = TimeSpan.FromSeconds(1);
 
-        public string DeviceManufacturer
-        {
-            get { return deviceManufacturer; }
-            set { deviceManufacturer = value; }
-        }
+		/// <summary>
+		/// Сиполняемые команды.
+		/// </summary>
+		public string Commands { get; set; }
 
-    }
+		/// <summary>
+		/// Необходимо ли включать лог.
+		/// </summary>
+		public bool DeviceLog { get; set; }
+
+	}
 }
