@@ -4,11 +4,11 @@
              xmlns:commands="clr-namespace:DroidBackuper.NET.ViewModels.Commands"
              xmlns:classHelpers="clr-namespace:DroidBackuper.NET.Classes.Helpers"
              xmlns:local="clr-namespace:DroidBackuper.NET"
+             xmlns:tb="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.NotifyIcon.Wpf"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
         <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-            xmlns:tb="http://www.hardcodet.net/taskbar">
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
             <!-- Globally declared notify icon -->
             <tb:TaskbarIcon x:Key="BackuperTrayIcon"
