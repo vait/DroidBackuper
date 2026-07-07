@@ -1,5 +1,9 @@
 # DroidBackuper
 DroidBackuper is a simple application for copy some user data from your device with Android.
+
+## Requirements
+- .NET 10.0
+- Windows
 ## Main idea
 The main idea of this project is automatically copy user data from my phone when I connect it to computer.
 First of all, I need to catch the device plug in event in Windows. Several search in Google requests led me to post on stackoverflow.com (How to identify what device was plugged into the USB slot?)[http://stackoverflow.com/questions/16620509/how-to-identify-what-device-was-plugged-into-the-usb-slot]. It would seem that a solution is found. But I think that solution give very small information about device. I want know more...
